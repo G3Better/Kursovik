@@ -11,7 +11,6 @@ export const uniqArrayForModal = (data: any, currentData: any, field: string) =>
 
 
 export const checkIsArrayDataFromModal = (data: any) => {
-    console.log(data);
     if (Array.isArray(data)) {
         return data?.[0]?.id;
     } else {

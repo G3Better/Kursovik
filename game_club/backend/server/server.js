@@ -225,11 +225,11 @@ server.post("/api/booking/add", function (req, res) {
 
 // Получение всех компьютеров
 server.get("/api/computers", function(req, res){
-    pool.query("SELECT computers.REG_Number as id, computers.Name as name, Details as details, computers_category.Name as computers_category, store.Name as store, status.Name as status FROM computers, computers_category, status, store WHERE Computers_Category_REG_Number=computers_category.REG_Number and Store_REG_Number=store.REG_Number and Status_REG_Number=status.REG_Number;", function(err, data) {
+    pool.query("SELECT computers.REG_Number as id, computers.Name as name, Details as details, computers_category.Name as category, store.Name as store, status.Name as status FROM computers, computers_category, status, store WHERE Computers_Category_REG_Number=computers_category.REG_Number and Store_REG_Number=store.REG_Number and Status_REG_Number=status.REG_Number;", function(err, data) {
         if (err) return console.error(err);
         if(!data.length) return res.sendStatus(400);
         const newData = data.map((elem) => {
-            return { id: elem.id, name: elem.name, details: elem.Details, computers_category: elem.computers_category, store: elem.store, status: elem.status}
+            return { id: elem.id, name: elem.name, details: elem.details, category: elem.category, store: elem.store, status: elem.status}
         })
         res.json(newData);
     });
@@ -248,8 +248,8 @@ server.delete("/api/computers/delete/:id", function (req, res) {
 // Редактирование компьютера
 server.put("/api/computers/edit/:id", function (req, res) {
     if (!req.body) return res.sendStatus(400);
-    const { id, name, details, computers_category, store, status } = req.body;
-    pool.query(`UPDATE  computers  SET  Name ='${name}', Details ='${details}', Computers_Category_REG_Number ='${computers_category}', Store_REG_Number ='${store}', Status_REG_Number ='${status}' WHERE  REG_Number ='${id}'`, function(err, data) {
+    const { id, name, details, category, store, status } = req.body;
+    pool.query(`UPDATE  computers  SET  Name ='${name}', Details ='${details}', Computers_Category_REG_Number ='${category}', Store_REG_Number ='${store}', Status_REG_Number ='${status}' WHERE  REG_Number ='${id}'`, function(err, data) {
         if (err) return console.error(err);
         res.json('computer updated');
     });
@@ -258,8 +258,8 @@ server.put("/api/computers/edit/:id", function (req, res) {
 // Добавление компьютера
 server.post("/api/computers/add", function (req, res) {
     if (!req.body) return res.sendStatus(400);
-    const { name, details, computers_category, store, status } = req.body;
-    pool.query(`INSERT INTO  computers ( REG_Number ,  Name ,  Details ,  Computers_Category_REG_Number ,  Store_REG_Number ,  Status_REG_Number ) VALUES ( null, '${name}','${details}','${computers_category}','${store}','${status}')`, function(err, data) {
+    const { name, details, category, store, status } = req.body;
+    pool.query(`INSERT INTO  computers ( REG_Number ,  Name ,  Details ,  Computers_Category_REG_Number ,  Store_REG_Number ,  Status_REG_Number ) VALUES ( null, '${name}','${details}','${category}','${store}','${status}')`, function(err, data) {
         if (err) return console.error(err);
         res.json('computer added');
     });
