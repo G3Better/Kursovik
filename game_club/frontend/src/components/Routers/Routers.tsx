@@ -7,6 +7,7 @@ import Employees from "../Employees/Employees";
 import Booking from "../Booking/Booking";
 import GamePlaces from "../GamePlaces/GamePlaces";
 import {roles} from "../../utills/roleUtills";
+import Computers from "../Computers/Computers";
 
 const Routers: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const Routers: React.FC = () => {
         <Route path="/" element={<Login />} />
         <Route path="/registr" element={<Registr />} />
         <Route element={<ProtectedRouters />}>
+          {roles.client !== localStorage.getItem("role") && <Route path="/computers" element={<Computers />} />}
           {roles.client !== localStorage.getItem("role") && <Route path="/users" element={<Employees />} />}
           <Route path="/booking" element={<Booking />} />
           <Route path="/game_places" element={<GamePlaces />} />

@@ -57,9 +57,9 @@ export const editGamePlaces = async (id: number, name: string, cost: number, com
 export const addGamePlaces = async (name: string, cost: number, computer: string, status: string, category: string) => {
     const res = await postRequest(`/api/game_places/add`, {}, { name, cost, computer, status, category });
     if (res) {
-        getGamePlaces()
-        return res;
+        const res2 = await getGamePlaces()
+        return res2;
     } else {
-        return "Не получилось добавить новое бронирование";
+        return "Не получилось добавить новое игровое место";
     }
 };

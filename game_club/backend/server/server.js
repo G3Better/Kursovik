@@ -101,7 +101,7 @@ server.put("/api/employee/edit/:id", function (req, res) {
 
 // Получение всех бронирований
 server.get("/api/booking", function(req, res){
-    pool.query("SELECT * FROM `бронирования`", function(err, data) {
+    pool.query("SELECT * FROM `бронирования` order by Incoming_DateTIme", function(err, data) {
         if (err) return console.error(err);
         if(!data.length) return res.sendStatus(400);
         const newData = data.map((elem) => {
@@ -113,7 +113,7 @@ server.get("/api/booking", function(req, res){
 
 // Получение всех Игровых мест
 server.get("/api/game_places", function(req, res){
-    pool.query("SELECT game_places.`REG_Number` as id, game_places.`Name` as name, `Cost` as cost, computers.Name as computer, status.Name as status, game_places_category.Name as category FROM `game_places`, computers, game_places_category, status WHERE Computers_REG_Number=computers.REG_Number and game_places.Status_REG_Number=status.REG_Number and Game_Places_Category_REG_Number=game_places_category.REG_Number;", function(err, data) {
+    pool.query("SELECT game_places.`REG_Number` as id, game_places.`Name` as name, `Cost` as cost, computers.Name as computer, status.Name as status, game_places_category.Name as category FROM `game_places`, computers, game_places_category, status WHERE Computers_REG_Number=computers.REG_Number and game_places.Status_REG_Number=status.REG_Number and Game_Places_Category_REG_Number=game_places_category.REG_Number order by name;", function(err, data) {
         if (err) return console.error(err);
         if(!data.length) return res.sendStatus(400);
         const newData = data.map((elem) => {
@@ -138,18 +138,6 @@ server.get("/api/game_places_model", function(req, res){
 // Получение всех статусов игрового места
 server.get("/api/statuses", function(req, res){
     pool.query("SELECT * FROM `status` WHERE REG_Number=5 or REG_Number=6 or REG_Number=7", function(err, data) {
-        if (err) return console.error(err);
-        if(!data.length) return res.sendStatus(400);
-        const newData = data.map((elem) => {
-            return { id: elem.REG_Number, name: elem.Name  }
-        })
-        res.json(newData);
-    });
-});
-
-// Получение всех компьютеров
-server.get("/api/computers", function(req, res){
-    pool.query("SELECT * FROM `computers`", function(err, data) {
         if (err) return console.error(err);
         if(!data.length) return res.sendStatus(400);
         const newData = data.map((elem) => {
@@ -232,5 +220,83 @@ server.post("/api/booking/add", function (req, res) {
     pool.query(`INSERT INTO booking (REG_Number, Incoming_DateTIme, Rental_Time, Users_REG_Number, Game_Places_REG_Number) VALUES (Null,'${Incoming_DateTime}','${Rental_Time}','${FIO}','${game_place}')`, function(err, data) {
         if (err) return console.error(err);
         res.json('booking updated');
+    });
+});
+
+// Получение всех компьютеров
+server.get("/api/computers", function(req, res){
+    pool.query("SELECT computers.REG_Number as id, computers.Name as name, Details as details, computers_category.Name as computers_category, store.Name as store, status.Name as status FROM computers, computers_category, status, store WHERE Computers_Category_REG_Number=computers_category.REG_Number and Store_REG_Number=store.REG_Number and Status_REG_Number=status.REG_Number;", function(err, data) {
+        if (err) return console.error(err);
+        if(!data.length) return res.sendStatus(400);
+        const newData = data.map((elem) => {
+            return { id: elem.id, name: elem.name, details: elem.Details, computers_category: elem.computers_category, store: elem.store, status: elem.status}
+        })
+        res.json(newData);
+    });
+});
+
+// Удаление компьютера
+server.delete("/api/computers/delete/:id", function (req, res) {
+    if(!req.body) return res.sendStatus(400);
+    const { id } = req.body;
+    pool.query(`DELETE FROM computers WHERE REG_Number = '${id}'`, function(err, data) {
+        if (err) return console.error(err);
+        res.json('computer deleted');
+    });
+});
+
+// Редактирование компьютера
+server.put("/api/computers/edit/:id", function (req, res) {
+    if (!req.body) return res.sendStatus(400);
+    const { id, name, details, computers_category, store, status } = req.body;
+    pool.query(`UPDATE  computers  SET  Name ='${name}', Details ='${details}', Computers_Category_REG_Number ='${computers_category}', Store_REG_Number ='${store}', Status_REG_Number ='${status}' WHERE  REG_Number ='${id}'`, function(err, data) {
+        if (err) return console.error(err);
+        res.json('computer updated');
+    });
+});
+
+// Добавление компьютера
+server.post("/api/computers/add", function (req, res) {
+    if (!req.body) return res.sendStatus(400);
+    const { name, details, computers_category, store, status } = req.body;
+    pool.query(`INSERT INTO  computers ( REG_Number ,  Name ,  Details ,  Computers_Category_REG_Number ,  Store_REG_Number ,  Status_REG_Number ) VALUES ( null, '${name}','${details}','${computers_category}','${store}','${status}')`, function(err, data) {
+        if (err) return console.error(err);
+        res.json('computer added');
+    });
+});
+
+// Получение всех статусов компьютеров
+server.get("/api/statuses_computers", function(req, res){
+    pool.query("SELECT * FROM `status` WHERE REG_Number=1 or REG_Number=2 or REG_Number=3 or REG_Number=8", function(err, data) {
+        if (err) return console.error(err);
+        if(!data.length) return res.sendStatus(400);
+        const newData = data.map((elem) => {
+            return { id: elem.REG_Number, name: elem.Name  }
+        })
+        res.json(newData);
+    });
+});
+
+// Получение всех категорий компьютеров
+server.get("/api/computers_category", function(req, res){
+    pool.query("SELECT * FROM `computers_category`", function(err, data) {
+        if (err) return console.error(err);
+        if(!data.length) return res.sendStatus(400);
+        const newData = data.map((elem) => {
+            return { id: elem.REG_Number, name: elem.Name }
+        })
+        res.json(newData);
+    });
+});
+
+// Получение всех складов
+server.get("/api/store", function(req, res){
+    pool.query("SELECT * FROM `store`", function(err, data) {
+        if (err) return console.error(err);
+        if(!data.length) return res.sendStatus(400);
+        const newData = data.map((elem) => {
+            return { id: elem.REG_Number, name: elem.Name }
+        })
+        res.json(newData);
     });
 });
